@@ -1,0 +1,186 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Ajustado para alinhar no topo */
+    min-height: 100vh;
+}
+
+.screen {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+    display: none; /* Esconde todas as telas por padrão */
+}
+
+.screen.active {
+    display: block; /* Mostra a tela ativa */
+}
+
+h1, h2, h3 { /* Adicionado h3 */
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"],
+select { /* Adicionado select */
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: block; /* Garante que cada input/select ocupe sua própria linha */
+}
+
+label { /* Estilo para os novos labels */
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: bold;
+}
+
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button#btn-logout {
+    background-color: #dc3545;
+    width: auto;
+    float: right;
+}
+
+button#btn-logout:hover {
+    background-color: #c82333;
+}
+
+button#btn-delete-point { /* Estilo para o botão de excluir */
+    background-color: #dc3545;
+}
+button#btn-delete-point:hover {
+    background-color: #c82333;
+}
+
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #dc3545;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#points-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+#points-list li {
+    background-color: #e9ecef;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1em;
+    color: #333;
+    cursor: pointer; /* Indica que é clicável */
+    transition: background-color 0.2s ease;
+}
+
+#points-list li:hover {
+    background-color: #d1e7dd; /* Um verde claro para indicar hover */
+}
+
+#points-list li span {
+    font-weight: bold;
+    color: #0056b3;
+}
+
+#points-list-section,
+#add-point-section,
+#point-details-section, /* Adicionado */
+#technician-form-section { /* Adicionado */
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+/* Esconder/Mostrar elementos específicos */
+#login-form, #register-form {
+    margin-top: 20px;
+}
+
+/* Estilos para a lista de técnicos */
+#technicians-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+#technicians-list li {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Para lidar com quebras de linha em telas pequenas */
+}
+
+#technicians-list li .tech-info {
+    flex-grow: 1; /* Permite que as informações do técnico ocupem espaço */
+    margin-right: 10px;
+}
+
+#technicians-list li .tech-actions button {
+    width: auto;
+    padding: 5px 10px;
+    font-size: 0.8em;
+    margin-left: 5px;
+    margin-bottom: 0; /* Remover margem inferior para botões de ação */
+}
+

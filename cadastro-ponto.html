@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Ponto - PAB/PAE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="cadastro-ponto.css">
+
+    <style>
+        /* Estilo para a tela de loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        /* Estilo para o spinner */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-[Inter] flex flex-col">
+
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="bg-blue-500 text-white p-4 text-center shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold flex-grow">PONTOS DE TERCEIROS PAB/PAE</h1>
+        <button id="backButton" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded-md text-sm transition duration-150 ease-in-out">
+            Voltar
+        </button>
+    </div>
+
+    <div class="container mx-auto p-4 flex-grow">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full">
+            <h2 id="formTitle" class="text-center text-2xl font-semibold mb-6 text-gray-800">CADASTRO DE PONTO</h2>
+
+            <form id="cadastroPontoForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="ponto" class="block text-sm font-medium text-gray-700">PONTO:</label>
+                    <input type="text" id="ponto" name="ponto" maxlength="4" pattern="\d{4}"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            placeholder="Ex: 8877">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="nome" class="block text-sm font-medium text-gray-700">NOME:</label>
+                    <input type="text" id="nome" name="nome"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            placeholder="Ex: STM BRASIL SISTEMAS LTDA">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="endereco" class="block text-sm font-medium text-gray-700">ENDEREÇO:</label>
+                    <input type="text" id="endereco" name="endereco"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            placeholder="Ex: RUA DE TESTES PARA O CHAT VER">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="cep" class="block text-sm font-medium text-gray-700">CEP:</label>
+                    <input type="text" id="cep" name="cep" maxlength="9" pattern="\d{5}-\d{3}"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            placeholder="Ex: 06777-190">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="cidade" class="block text-sm font-medium text-gray-700">CIDADE:</label>
+                    <input type="text" id="cidade" name="cidade"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            placeholder="Ex: COTIA">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="estado" class="block text-sm font-medium text-gray-700">ESTADO:</label>
+                    <input type="text" id="estado" name="estado" maxlength="2"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                            placeholder="Ex: SÃO PAULO">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="email" class="block text-sm font-medium text-gray-700">EMAIL:</label>
+                    <input type="text" id="email" name="email"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                           placeholder="Ex: contato@empresa.com; outro@dominio.com">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="tipo" class="block text-sm font-medium text-gray-700">TIPO:</label>
+                    <select id="tipo" name="tipo"
+                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm">
+                        <option value="">Selecione o Tipo</option>
+                        <option value="PAB">PAB</option>
+                        <option value="PAE">PAE</option>
+                        <option value="AGENCIA">AGENCIA</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="transportadora" class="block text-sm font-medium text-gray-700">TRANSPORTADORA:</label>
+                    <select id="transportadora" name="transportadora"
+                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm">
+                        <option value="">Selecione a Transportadora</option>
+                        <option value="Protege">Protege</option>
+                        <option value="Brinks">Brinks</option>
+                        <option value="Prosegur">Prosegur</option>
+                        <option value="TBForte">TBForte</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label class="block text-sm font-medium text-gray-700">PRECISA DE EMAIL DE LIBERAÇÃO?:</label>
+                    <div class="flex items-center space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="emailLiberacao" value="sim" class="form-radio text-green-600">
+                            <span class="ml-2">SIM</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="emailLiberacao" value="nao" class="form-radio text-red-600">
+                            <span class="ml-2">NÃO</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label class="block text-sm font-medium text-gray-700">PRECISA DE INTEGRAÇÃO:</label>
+                    <div class="flex items-center space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="integracao" value="sim" class="form-radio text-green-600">
+                            <span class="ml-2">SIM</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="integracao" value="nao" class="form-radio text-red-600">
+                            <span class="ml-2">NÃO</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label for="documentosIntegracao" class="block text-sm font-medium text-gray-700">DOCUMENTOS NECESSÁRIOS PARA INTEGRAÇÃO:</label>
+                    <textarea id="documentosIntegracao" name="documentosIntegracao" rows="4"
+                                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                 placeholder="Liste os documentos necessários, um por linha."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <label for="caminhoAnexos" class="block text-sm font-medium text-gray-700">CAMINHO DOS ANEXOS:</label>
+                    <input type="text" id="caminhoAnexos" name="caminhoAnexos"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                           placeholder="Ex: https://link.para.seus.anexos.com/documento.pdf">
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">TECNICO INTEGRADO</h3>
+                    <div id="tecnicosContainer" class="space-y-3">
+                        </div>
+                    <button type="button" id="addTecnicoButton"
+                             class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                        Adicionar Técnico
+                    </button>
+                </div>
+            </form>
+            
+            <div class="flex justify-end space-x-3 mt-8">
+                <button type="button" id="cancelCadastroPonto"
+                         class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                    Cancelar
+                </button>
+                <button type="button" id="deleteButton"
+                         class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out hidden">
+                    Excluir Ponto
+                </button>
+                <button type="submit" id="saveButton" form="cadastroPontoForm"
+                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                    Salvar Ponto
+                </button>
+            </div>
+
+
+            <div id="messageBox" class="mt-4 p-3 rounded-md text-center hidden"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Importa as funções necessárias do Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Sua configuração do Firebase (fornecida por você)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDSYwYxg4nJ2tsuRDJcW4XAnLBmPtvODqw",
+            authDomain: "pabpae-18647.firebaseapp.com",
+            projectId: "pabpae-18647",
+            storageBucket: "pabpae-18647.firebasestorage.app",
+            messagingSenderId: "456526227091",
+            appId: "1:456526227091:web:59a83dd513721877a30f66",
+            measurementId: "G-TC306C9MNX"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Elementos do DOM
+        const formTitle = document.getElementById('formTitle');
+        const cadastroPontoForm = document.getElementById('cadastroPontoForm');
+        const tecnicosContainer = document.getElementById('tecnicosContainer');
+        const addTecnicoButton = document.getElementById('addTecnicoButton');
+        const messageBox = document.getElementById('messageBox');
+        const backButton = document.getElementById('backButton');
+        const cancelCadastroPontoButton = document.getElementById('cancelCadastroPonto');
+        const saveButton = document.getElementById('saveButton');
+        const deleteButton = document.getElementById('deleteButton');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // Campos do formulário
+        const pontoInput = document.getElementById('ponto');
+        const nomeInput = document.getElementById('nome');
+        const enderecoInput = document.getElementById('endereco');
+        const cepInput = document.getElementById('cep');
+        const cidadeInput = document.getElementById('cidade');
+        const estadoInput = document.getElementById('estado');
+        const emailInput = document.getElementById('email');
+        const tipoInput = document.getElementById('tipo');
+        const transportadoraInput = document.getElementById('transportadora');
+        const emailLiberacaoRadios = document.querySelectorAll('input[name="emailLiberacao"]');
+        const integracaoRadios = document.querySelectorAll('input[name="integracao"]');
+        const documentosIntegracaoInput = document.getElementById('documentosIntegracao');
+        const caminhoAnexosInput = document.getElementById('caminhoAnexos');
+
+        let tecnicoCount = 0;
+        let currentPontoId = null;
+
+        // Funções para mostrar/esconder a tela de loading
+        function showLoading() {
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        // Função para exibir mensagens na caixa de mensagem
+        function showMessage(message, type = 'error') {
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'text-red-700');
+            } else {
+                messageBox.classList.add('bg-green-100', 'text-green-700');
+            }
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Função para adicionar um novo campo de técnico
+        function addTecnicoField(cpf = '', nome = '', aso = '', rg = '', veiculo = '', placa = '', corCarro = '', fichaEpi = '') {
+            tecnicoCount++;
+            const tecnicoDiv = document.createElement('div');
+            tecnicoDiv.classList.add('flex', 'flex-wrap', 'gap-2', 'md:gap-4', 'items-center', 'border', 'border-gray-200', 'p-3', 'rounded-md', 'bg-gray-50');
+            tecnicoDiv.innerHTML = `
+                <div class="w-full md:w-1/4">
+                    <label for="tecnicoCpf_${tecnicoCount}" class="block text-xs font-medium text-gray-600">CPF:</label>
+                    <input type="text" id="tecnicoCpf_${tecnicoCount}" name="tecnicoCpf_${tecnicoCount}" value="${cpf}"
+                           class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                           placeholder="Ex: 123.456.789-00">
+                </div>
+                <div class="w-full md:w-1/4">
+                    <label for="tecnicoNome_${tecnicoCount}" class="block text-xs font-medium text-gray-600">Nome:</label>
+                    <input type="text" id="tecnicoNome_${tecnicoCount}" name="tecnicoNome_${tecnicoCount}" value="${nome}"
+                           class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                           placeholder="Nome do Técnico">
+                </div>
+                <div class="w-full md:w-1/4">
+                    <label for="tecnicoAso_${tecnicoCount}" class="block text-xs font-medium text-gray-600">ASO (Data):</label>
+                    <input type="date" id="tecnicoAso_${tecnicoCount}" name="tecnicoAso_${tecnicoCount}" value="${aso}"
+                           class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                </div>
+                <div class="w-full md:w-1/4">
+                    <label for="tecnicoFichaEpi_${tecnicoCount}" class="block text-xs font-medium text-gray-600">Ficha EPI (Data):</label>
+                    <input type="date" id="tecnicoFichaEpi_${tecnicoCount}" name="tecnicoFichaEpi_${tecnicoCount}" value="${fichaEpi}"
+                           class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                </div>
+                <div class="w-full md:w-1/4">
+                    <label for="tecnicoRg_${tecnicoCount}" class="block text-xs font-medium text-gray-600">RG:</label>
+                    <input type="text" id="tecnicoRg_${tecnicoCount}" name="tecnicoRg_${tecnicoCount}" value="${rg}"
+                           class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                           placeholder="Ex: 12.345.678-9">
+                </div>
+                <div class="w-full md:w-1/4">
+                    <label for="tecnicoVeiculo_${tecnicoCount}" class="block text-xs font-medium text-gray-600">Veículo:</label>
+                    <input type="text" id="tecnicoVeiculo_${tecnicoCount}" name="tecnicoVeiculo_${tecnicoCount}" value="${veiculo}"
+                           class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                           placeholder="Ex: Fiat Uno">
+                </div>
+                <div class="w-full md:w-1/4">
+                    <label for="tecnicoPlaca_${tecnicoCount}" class="block text-xs font-medium text-gray-600">Placa:</label>
+                    <input type="text" id="tecnicoPlaca_${tecnicoCount}" name="tecnicoPlaca_${tecnicoCount}" value="${placa}"
+                           class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                           placeholder="Ex: ABC-1234">
+                </div>
+                <div class="w-full md:w-1/4">
+                    <label for="tecnicoCorCarro_${tecnicoCount}" class="block text-xs font-medium text-gray-600">Cor do Carro:</label>
+                    <input type="text" id="tecnicoCorCarro_${tecnicoCount}" name="tecnicoCorCarro_${tecnicoCount}" value="${corCarro}"
+                           class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                           placeholder="Ex: Prata">
+                </div>
+                <button type="button" class="remove-tecnico-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded-md text-xs transition duration-150 ease-in-out">
+                    Remover
+                </button>
+            `;
+            tecnicosContainer.appendChild(tecnicoDiv);
+
+            tecnicoDiv.querySelector('.remove-tecnico-btn').addEventListener('click', () => {
+                tecnicoDiv.remove();
+            });
+        }
+
+        async function loadPontoForEdit(pontoId) {
+            try {
+                const pontoRef = doc(db, "pontos", pontoId);
+                const pontoSnap = await getDoc(pontoRef);
+
+                if (pontoSnap.exists()) {
+                    const pontoData = pontoSnap.data();
+                    formTitle.textContent = 'EDITAR PONTO';
+                    saveButton.textContent = 'Atualizar Ponto';
+                    deleteButton.classList.remove('hidden');
+
+                    pontoInput.value = pontoData.agencia || '';
+                    nomeInput.value = pontoData.nomePonto || '';
+                    enderecoInput.value = pontoData.endereco || '';
+                    cepInput.value = pontoData.cep || '';
+                    cidadeInput.value = pontoData.cidade || '';
+                    estadoInput.value = pontoData.estado || '';
+                    emailInput.value = pontoData.email || '';
+                    tipoInput.value = pontoData.tipo || '';
+                    transportadoraInput.value = pontoData.transportadora || '';
+                    documentosIntegracaoInput.value = pontoData.documentosIntegracao || '';
+                    caminhoAnexosInput.value = pontoData.caminhoAnexos || '';
+
+                    emailLiberacaoRadios.forEach(radio => radio.checked = false);
+                    if (pontoData.precisaEmailLiberacao === true) {
+                        document.querySelector('input[name="emailLiberacao"][value="sim"]').checked = true;
+                    } else if (pontoData.precisaEmailLiberacao === false) {
+                        document.querySelector('input[name="emailLiberacao"][value="nao"]').checked = true;
+                    }
+
+                    integracaoRadios.forEach(radio => radio.checked = false);
+                    if (pontoData.precisaIntegracao === true) {
+                        document.querySelector('input[name="integracao"][value="sim"]').checked = true;
+                    } else if (pontoData.precisaIntegracao === false) {
+                        document.querySelector('input[name="integracao"][value="nao"]').checked = true;
+                    }
+
+                    tecnicosContainer.innerHTML = '';
+                    tecnicoCount = 0;
+                    if (pontoData.tecnicosIntegrados && pontoData.tecnicosIntegrados.length > 0) {
+                        pontoData.tecnicosIntegrados.forEach(tecnico => {
+                            addTecnicoField(tecnico.cpf, tecnico.nome, tecnico.aso, tecnico.rg, tecnico.veiculo, tecnico.placa, tecnico.corCarro, tecnico.fichaEpi);
+                        });
+                    } else {
+                        addTecnicoField();
+                    }
+                } else {
+                    showMessage('Ponto não encontrado para edição.', 'error');
+                    console.error("No such document!");
+                    setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar ponto para edição:", error);
+                showMessage(`Erro ao carregar ponto: ${error.message}`, 'error');
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentPontoId = urlParams.get('id');
+
+            if (currentPontoId) {
+                loadPontoForEdit(currentPontoId);
+            } else {
+                addTecnicoField();
+                deleteButton.classList.add('hidden');
+            }
+        });
+
+        addTecnicoButton.addEventListener('click', addTecnicoField);
+
+        const multipleEmailsRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))(\s*[;,]\s*(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))*$/;
+
+        cadastroPontoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            showLoading();
+
+            const agencia = pontoInput.value.trim();
+            const nomePonto = nomeInput.value.trim();
+            const endereco = enderecoInput.value.trim();
+            const cep = cepInput.value.trim();
+            const cidade = cidadeInput.value.trim();
+            const estado = estadoInput.value.trim();
+            const email = emailInput.value.trim();
+            const tipo = tipoInput.value;
+            const transportadora = transportadoraInput.value;
+            const emailLiberacao = document.querySelector('input[name="emailLiberacao"]:checked')?.value;
+            const documentosIntegracao = documentosIntegracaoInput.value.trim();
+            const caminhoAnexos = caminhoAnexosInput.value.trim();
+            const integracao = document.querySelector('input[name="integracao"]:checked')?.value;
+
+            if (email && !multipleEmailsRegex.test(email)) {
+                showMessage('Por favor, insira um formato de email válido. Use vírgulas ou ponto e vírgula para separar múltiplos emails.', 'error');
+                hideLoading();
+                return;
+            }
+
+            const tecnicos = [];
+            document.querySelectorAll('#tecnicosContainer > div').forEach(tecnicoDiv => {
+                const cpfInput = tecnicoDiv.querySelector('input[id^="tecnicoCpf_"]');
+                const nomeTecnicoInput = tecnicoDiv.querySelector('input[id^="tecnicoNome_"]');
+                const asoInput = tecnicoDiv.querySelector('input[id^="tecnicoAso_"]');
+                const rgInput = tecnicoDiv.querySelector('input[id^="tecnicoRg_"]');
+                const veiculoInput = tecnicoDiv.querySelector('input[id^="tecnicoVeiculo_"]');
+                const placaInput = tecnicoDiv.querySelector('input[id^="tecnicoPlaca_"]');
+                const corCarroInput = tecnicoDiv.querySelector('input[id^="tecnicoCorCarro_"]');
+                const fichaEpiInput = tecnicoDiv.querySelector('input[id^="tecnicoFichaEpi_"]');
+                if (cpfInput.value.trim() || nomeTecnicoInput.value.trim() || asoInput.value.trim()) {
+                    tecnicos.push({
+                        cpf: cpfInput.value.trim(),
+                        nome: nomeTecnicoInput.value.trim(),
+                        aso: asoInput.value.trim(),
+                        rg: rgInput ? rgInput.value.trim() : '',
+                        veiculo: veiculoInput ? veiculoInput.value.trim() : '',
+                        placa: placaInput ? placaInput.value.trim() : '',
+                        corCarro: corCarroInput ? corCarroInput.value.trim() : '',
+                        fichaEpi: fichaEpiInput ? fichaEpiInput.value.trim() : ''
+                    });
+                }
+            });
+
+            const pontoData = {
+                agencia: agencia,
+                nomePonto: nomePonto,
+                endereco: endereco,
+                cep: cep,
+                cidade: cidade,
+                estado: estado.toUpperCase(),
+                email: email,
+                tipo: tipo,
+                transportadora: transportadora,
+                precisaEmailLiberacao: emailLiberacao === 'sim',
+                precisaIntegracao: integracao === 'sim',
+                documentosIntegracao: documentosIntegracao,
+                caminhoAnexos: caminhoAnexos,
+                tecnicosIntegrados: tecnicos,
+            };
+            
+            try {
+                if (currentPontoId) {
+                    const pontoRef = doc(db, "pontos", currentPontoId);
+                    await updateDoc(pontoRef, {
+                        ...pontoData,
+                        updatedAt: serverTimestamp()
+                    });
+                    showMessage('Ponto atualizado com sucesso!', 'success');
+                } else {
+                    await addDoc(collection(db, "pontos"), {
+                        ...pontoData,
+                        createdAt: serverTimestamp(),
+                        createdBy: auth.currentUser.uid
+                    });
+                    showMessage('Ponto cadastrado com sucesso!', 'success');
+                    cadastroPontoForm.reset();
+                    tecnicosContainer.innerHTML = '';
+                    addTecnicoField();
+                }
+
+                setTimeout(() => {
+                    hideLoading();
+                    window.location.href = 'index.html';
+                }, 2000);
+
+            } catch (error) {
+                console.error("Erro ao salvar ponto:", error);
+                showMessage(`Erro ao salvar ponto: ${error.message}`, 'error');
+                hideLoading();
+            }
+        });
+
+        deleteButton.addEventListener('click', async () => {
+            if (currentPontoId && confirm('Tem certeza que deseja excluir este ponto? Esta ação não pode ser desfeita.')) {
+                showLoading();
+                try {
+                    const pontoRef = doc(db, "pontos", currentPontoId);
+                    await deleteDoc(pontoRef);
+                    showMessage('Ponto excluído com sucesso!', 'success');
+                    setTimeout(() => {
+                        hideLoading();
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } catch (error) {
+                    console.error("Erro ao excluir ponto:", error);
+                    showMessage(`Erro ao excluir ponto: ${error.message}`, 'error');
+                    hideLoading();
+                }
+            }
+        });
+
+        backButton.addEventListener('click', () => {
+            window.history.back();
+        });
+
+        cancelCadastroPontoButton.addEventListener('click', () => {
+            window.history.back();
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

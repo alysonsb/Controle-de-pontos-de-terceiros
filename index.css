@@ -1,0 +1,9 @@
+/* index.css */
+/* Adicione estilos personalizados aqui, se necessário. */
+
+/* Exemplo: Ajuste para o modal em telas muito pequenas */
+@media (max-width: 640px) {
+    #cadastroModal > div {
+        margin: 1rem; /* Adiciona um pouco de margem ao redor do modal */
+    }
+}

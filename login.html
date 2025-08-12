@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PAB/PAE</title>
+    <!-- Inclui Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Define a fonte Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Link para o arquivo CSS personalizado (se necessário, mas Tailwind já cobre muito) -->
+    <link rel="stylesheet" href="login.css">
+    <style>
+        /* Estilos para o spinner de carregamento */
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen font-[Inter]">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <!-- Cabeçalho principal -->
+        <div class="bg-blue-500 text-white p-4 rounded-t-lg mb-6 -mx-8 -mt-8">
+            <h1 class="text-xl font-bold text-center">PONTOS DE TERCEIROS PAB/PAE</h1>
+        </div>
+
+        <!-- Título do formulário de login -->
+        <h2 class="text-center text-2xl font-semibold mb-6 text-gray-800">LOGIN</h2>
+
+        <form id="loginForm" class="space-y-4">
+            <!-- Campo de Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">EMAIL</label>
+                <input type="email" id="email" name="email" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm">
+            </div>
+
+            <!-- Campo de Senha -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">SENHA</label>
+                <input type="password" id="password" name="password" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm">
+            </div>
+
+            <!-- Botão Entrar -->
+            <button type="submit" id="loginButton"
+                    class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                ENTRAR
+            </button>
+        </form>
+
+        <!-- Área para mensagens de erro/sucesso -->
+        <div id="messageBox" class="mt-4 p-3 rounded-md text-center hidden"></div>
+    </div>
+
+    <!-- Overlay de Loading -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="flex flex-col items-center">
+            <div class="loader"></div>
+            <p class="text-white mt-4 text-lg">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Importa os SDKs do Firebase -->
+    <script type="module">
+        // Importa as funções necessárias do Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Sua configuração do Firebase (fornecida por você)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDSYwYxg4nJ2tsuRDJcW4XAnLBmPtvODqw",
+            authDomain: "pabpae-18647.firebaseapp.com",
+            projectId: "pabpae-18647",
+            storageBucket: "pabpae-18647.firebasestorage.app",
+            messagingSenderId: "456526227091",
+            appId: "1:456526227091:web:59a83dd513721877a30f66",
+            measurementId: "G-TC306C9MNX"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app); // Obtém a instância de autenticação
+
+        // Elementos do DOM
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const messageBox = document.getElementById('messageBox');
+        const loadingOverlay = document.getElementById('loadingOverlay'); // Referência ao overlay de loading
+        const loginButton = document.getElementById('loginButton'); // Referência ao botão de login
+
+        // Função para exibir mensagens na caixa de mensagem
+        function showMessage(message, type = 'error') {
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'text-red-700');
+            } else {
+                messageBox.classList.add('bg-green-100', 'text-green-700');
+            }
+            // Opcional: esconder a mensagem após alguns segundos
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Função para mostrar o overlay de loading
+        function showLoading() {
+            loadingOverlay.classList.remove('hidden');
+            loginButton.disabled = true; // Desabilita o botão para evitar múltiplos cliques
+        }
+
+        // Função para esconder o overlay de loading
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+            loginButton.disabled = false; // Habilita o botão
+        }
+
+        // Adiciona um listener para o envio do formulário
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            showLoading(); // Mostra a tela de loading
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            try {
+                // Tenta fazer login com e-mail e senha
+                await signInWithEmailAndPassword(auth, email, password);
+                showMessage('Login bem-sucedido! Redirecionando...', 'success');
+                // Redireciona para a página inicial após o login
+                // Um pequeno atraso para o usuário ver a mensagem de sucesso
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } catch (error) {
+                // Captura e exibe erros de autenticação
+                let errorMessage = 'Ocorreu um erro. Por favor, tente novamente.';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'Email ou senha inválidos.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Formato de email inválido.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Muitas tentativas de login. Tente novamente mais tarde.';
+                        break;
+                    default:
+                        errorMessage = `Erro: ${error.message}`;
+                }
+                showMessage(errorMessage, 'error');
+                console.error("Erro de Login:", error);
+            } finally {
+                hideLoading(); // Esconde a tela de loading em qualquer caso (sucesso ou erro)
+            }
+        });
+
+        // Opcional: Verifica o estado da autenticação ao carregar a página
+        // Se o usuário já estiver logado, redireciona para a página inicial
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuário está logado
+                console.log("Usuário já logado:", user.email);
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

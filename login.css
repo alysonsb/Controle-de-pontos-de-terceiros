@@ -1,0 +1,10 @@
+/* login.css */
+/* Este arquivo é opcional, pois a maioria dos estilos é tratada pelo Tailwind CSS. */
+/* Adicione estilos personalizados aqui, se necessário. */
+
+/* Exemplo: Ajuste de espaçamento para telas muito pequenas, se o Tailwind padrão não for suficiente */
+@media (max-width: 640px) {
+    .max-w-md {
+        margin: 1rem; /* Adiciona um pouco de margem em telas pequenas */
+    }
+}

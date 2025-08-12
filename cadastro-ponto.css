@@ -1,0 +1,9 @@
+/* cadastro-ponto.css */
+/* Adicione estilos personalizados aqui, se necessário. */
+
+/* Ajustes para layout em telas menores */
+@media (max-width: 768px) {
+    .grid-cols-1.md:grid-cols-2 {
+        grid-template-columns: 1fr; /* Força uma coluna em telas menores */
+    }
+}
